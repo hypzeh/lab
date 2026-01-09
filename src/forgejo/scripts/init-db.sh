@@ -1,0 +1,40 @@
+#!/usr/bin/env sh
+set -eu
+
+: "${POSTGRES_HOST:?POSTGRES_HOST must be set}"
+: "${POSTGRES_PORT:?POSTGRES_PORT must be set}"
+: "${POSTGRES_USER:?POSTGRES_USER must be set}"
+: "${POSTGRES_PASSWORD:?POSTGRES_PASSWORD must be set}"
+: "${FORGEJO_DATABASE:?FORGEJO_DATABASE must be set}"
+: "${FORGEJO_DATABASE_USER:?FORGEJO_DATABASE_USER must be set}"
+: "${FORGEJO_DATABASE_PASSWORD:?FORGEJO_DATABASE_PASSWORD must be set}"
+
+echo "Waiting for Postgres at ${POSTGRES_HOST}:${POSTGRES_PORT}..."
+until pg_isready -h "${POSTGRES_HOST}" -p "${POSTGRES_PORT}" -U "${POSTGRES_USER}" >/dev/null 2>&1; do
+  sleep 1
+done
+
+echo "Ensuring role '${FORGEJO_DATABASE_USER}' exists..."
+psql -h "${POSTGRES_HOST}" -p "${POSTGRES_PORT}" -U "${POSTGRES_USER}" -d postgres -v ON_ERROR_STOP=1 <<SQL
+DO \$\$
+BEGIN
+  IF NOT EXISTS (SELECT FROM pg_catalog.pg_roles WHERE rolname = '${FORGEJO_DATABASE_USER}') THEN
+    CREATE ROLE ${FORGEJO_DATABASE_USER} LOGIN PASSWORD '${FORGEJO_DATABASE_PASSWORD}';
+  END IF;
+END
+\$\$;
+SQL
+
+echo "Ensuring database '${FORGEJO_DATABASE}' exists..."
+psql -h "$POSTGRES_HOST" -p "$POSTGRES_PORT" -U "$POSTGRES_USER" -d postgres -v ON_ERROR_STOP=1 <<SQL
+SELECT 'CREATE DATABASE ${FORGEJO_DATABASE} OWNER ${FORGEJO_DATABASE_USER}'
+WHERE NOT EXISTS (SELECT FROM pg_database WHERE datname = '${FORGEJO_DATABASE}')\\gexec
+SQL
+
+echo "Ensuring ownership/privileges..."
+psql -h "$POSTGRES_HOST" -p "$POSTGRES_PORT" -U "$POSTGRES_USER" -d "${FORGEJO_DATABASE}" -v ON_ERROR_STOP=1 <<SQL
+ALTER DATABASE ${FORGEJO_DATABASE} OWNER TO ${FORGEJO_DATABASE_USER};
+GRANT ALL PRIVILEGES ON DATABASE ${FORGEJO_DATABASE} TO ${FORGEJO_DATABASE_USER};
+SQL
+
+echo "Forgejo database init complete."
