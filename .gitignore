@@ -1,3 +1,6 @@
+# environment variables / secrets
 .env
-data/
-!data/.placeholder
+
+# runtime data directories (bind mounts)
+**/data/*
+!**/data/.placeholder
