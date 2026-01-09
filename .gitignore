@@ -3,4 +3,4 @@
 
 # runtime data directories (bind mounts)
 **/data/*
-!**/data/.placeholder
+!**/data/.gitkeep
