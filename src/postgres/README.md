@@ -3,4 +3,5 @@
 ```shell
 docker network create postgres-network
 docker compose up -d
+docker compose logs -f --tail=200
 ```
