@@ -9,6 +9,8 @@ set -eu
 : "${FORGEJO_DATABASE_USER:?FORGEJO_DATABASE_USER must be set}"
 : "${FORGEJO_DATABASE_PASSWORD:?FORGEJO_DATABASE_PASSWORD must be set}"
 
+export PGPASSWORD="${POSTGRES_PASSWORD}"
+
 echo "Waiting for Postgres at ${POSTGRES_HOST}:${POSTGRES_PORT}..."
 until pg_isready -h "${POSTGRES_HOST}" -p "${POSTGRES_PORT}" -U "${POSTGRES_USER}" >/dev/null 2>&1; do
   sleep 1

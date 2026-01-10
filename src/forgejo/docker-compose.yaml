@@ -1,30 +1,30 @@
 services:
-  # forgejo:
-  #   image: codeberg.org/forgejo/forgejo:13
-  #   container_name: forgejo
-  #   restart: unless-stopped
-  #   environment:
-  #     USER_UID: 1000
-  #     USER_GID: 1000
-  #     FORGEJO__database__DB_TYPE: postgres
-  #     FORGEJO__database__HOST: postgres:5432
-  #     FORGEJO__database__NAME: forgejo
-  #     FORGEJO__database__USER: forgejo
-  #     FORGEJO__database__PASSWD: ${FORGEJO_DATABASE_USER_PASSWORD}
-  #     FORGEJO__server__DOMAIN: ${FORGEJO_DOMAIN}
-  #     FORGEJO__server__ROOT_URL: ${FORGEJO_ROOT_URL}
-  #     FORGEJO__server__HTTP_PORT: 3000
-  #     FORGEJO__server__DISABLE_SSH: true
-  #     FORGEJO__server__PROTOCOL: http
-  #   ports:
-  #     - "127.0.0.1:3000:3000"
-  #   networks:
-  #     - postgres-network
-  #   volumes:
-  #     - ./data:/data
-  #     - /etc/localtime:/etc/localtime:ro
-  #   depends_on:
-  #     - forgejo-db-init
+  forgejo:
+    image: codeberg.org/forgejo/forgejo:13
+    container_name: forgejo
+    restart: unless-stopped
+    environment:
+      USER_UID: 1000
+      USER_GID: 1000
+      FORGEJO__database__DB_TYPE: postgres
+      FORGEJO__database__HOST: postgres:5432
+      FORGEJO__database__NAME: forgejo
+      FORGEJO__database__USER: forgejo
+      FORGEJO__database__PASSWD: ${FORGEJO_DATABASE_USER_PASSWORD}
+      FORGEJO__server__DOMAIN: ${FORGEJO_DOMAIN}
+      FORGEJO__server__ROOT_URL: ${FORGEJO_ROOT_URL}
+      FORGEJO__server__HTTP_PORT: 3000
+      FORGEJO__server__DISABLE_SSH: true
+      FORGEJO__server__PROTOCOL: http
+    ports:
+      - "127.0.0.1:3000:3000"
+    networks:
+      - postgres-network
+    volumes:
+      - ./data:/data
+      - /etc/localtime:/etc/localtime:ro
+    depends_on:
+      - forgejo-db-init
 
   forgejo-db-init:
     image: postgres:18
