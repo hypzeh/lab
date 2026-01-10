@@ -1,1 +1,6 @@
+# environment variables / secrets
 .env
+
+# runtime data directories (bind mounts)
+**/data/*
+!**/data/.gitkeep
